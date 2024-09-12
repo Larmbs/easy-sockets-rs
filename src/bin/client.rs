@@ -1,17 +1,20 @@
 //! Client side of script
 use easy_sockets::{sleep, start_client, Deserialize, Duration, Serialize, SimpleClient};
 
+/// Message that a Client sends
 #[derive(Serialize, Deserialize)]
 enum ClientMsg {
     Ping(String),
 }
 
+/// Message that the server sends
 #[derive(Serialize, Deserialize)]
 enum ServerMsg {
     Error(u16),
     Ping(String),
 }
 
+/// Client side
 struct Client {
     ping_count: usize,
 }
@@ -43,7 +46,6 @@ impl SimpleClient for Client {
     }
 }
 
-#[tokio::main]
-async fn main() {
+fn main() {
     start_client("127.0.0.1:8000", Client::new()).expect("Failed to open client");
 }
