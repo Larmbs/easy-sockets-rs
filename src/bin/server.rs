@@ -1,17 +1,20 @@
 //! Server side of script
 use easy_sockets::{Deserialize, Serialize, ServerConn, start_server, tokio};
 
+/// Message that a Client sends
 #[derive(Serialize, Deserialize)]
 enum ClientMsg {
     Ping(String),
 }
 
+/// Message that the server sends
 #[derive(Serialize, Deserialize)]
 enum ServerMsg {
     Error(u16),
     Ping(String),
 }
 
+/// An instance between a server and client
 struct ServerInstance {
     response: String,
 }
