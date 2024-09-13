@@ -8,6 +8,8 @@ This project is similar to a previous project of mine, in this project I aimed t
 
 [Easy ESP Project](https://github.com/Larmbs/easy_esp)
 
+---
+
 ## Examples
 Here are some examples of the process.
 
