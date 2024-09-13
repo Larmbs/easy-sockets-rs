@@ -5,6 +5,7 @@ A major goal of this project is simplicity, meaning using little dependencies an
 
 ## Details
 This project is similar to a previous project of mine, in this project I aimed to simplify that creation of a server capable of talking with an ESP32 microcontroller. There are many parallels between the two and to add more features this version held. This project stopped pver complications with ownership, now I plan on remedying this by taking on a more functional approach.
+
 [Easy ESP Project](https://github.com/Larmbs/easy_esp)
 
 ## Examples
