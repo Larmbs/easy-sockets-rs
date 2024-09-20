@@ -1,19 +1,29 @@
+//! Easy Sockets Rust
+//! -----------------
+//! Quick and easy way of building up complex socket protocols.
+//!
+
 use anyhow::{Context, Result};
 use bincode::{deserialize, serialize};
 use lazy_static::lazy_static;
 pub use serde::{Deserialize, Serialize};
+
 use std::io::{Read, Write};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::sync::Mutex;
+
 pub use std::{thread::sleep, time::Duration};
 pub use tokio;
+
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net;
+
 
 lazy_static! {
     static ref CLIENT: Mutex<Option<TcpStream>> = Mutex::new(None);
 }
 
+/// The default buffer size expected from a socket message.
 const BUFFER_SIZE: usize = 1024;
 pub type Bytes = Vec<u8>;
 
@@ -27,7 +37,8 @@ pub trait ServerConn {
 		/// This function runs every time the server-conn receives a client message. You need to decide what message tp respond with.
 		/// 
     fn handle_message(&mut self, message: Self::ClientMsg) -> Self::ServerMsg;
-
+    
+		/// Opens a new server connection.
     fn new() -> Self;
 }
 
@@ -59,16 +70,16 @@ pub trait SimpleClient {
 		///
     fn handle_response(&mut self, response: Self::ServerMsg);
 
-    /// Runs over and over (main loop)
+    /// Runs over and over (main loop).
     fn update(&mut self) -> Option<()>;
     
-		/// Starts up the client
+		/// Starts up the client.
     fn start_up(&mut self) {
         while self.update().is_some() {}
     }
 }
 
-/// Type able to be sent between server a client
+/// Type able to be sent between server a client.
 pub trait MsgAble {
     fn to_bytes(&self) -> Result<Bytes>;
     fn from_bytes(bytes: &Bytes) -> Result<Self>
@@ -79,28 +90,28 @@ impl<T> MsgAble for T
 where
     T: Serialize + for<'de> Deserialize<'de> + Send + 'static,
 {
-	  /// Converts object to bytes
+	  /// Converts object to bytes.
     fn to_bytes(&self) -> Result<Bytes> {
         serialize(self).context("Failed to serialize object")
     }
-		/// Creates an object from bytes
+		/// Creates an object from bytes.
     fn from_bytes(bytes: &Bytes) -> Result<Self> {
         deserialize(bytes).context("Failed to deserialize object")
     }
 }
 
-/// Starts client socket stream
+/// Starts client socket stream.
 pub fn start_client<T: SimpleClient>(address: impl ToSocketAddrs, client: T) -> Result<()> {
-    // Connect to the server
+    // Connect to the server.
     let stream = TcpStream::connect(address).context("Failed to connect to server")?;
 
-    // Lock and set the global client
+    // Lock and set the global client.
     {
         let mut client_lock = CLIENT.lock().unwrap();
         *client_lock = Some(stream);
     }
 
-    // Run the client
+    // Run the client.
     let mut client = client;
     client.start_up();
 
