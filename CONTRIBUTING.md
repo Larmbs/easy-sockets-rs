@@ -1,7 +1,7 @@
 Contributor License Agreement
 
 This Contributor License Agreement ("Agreement") is agreed to by the party contributing code to project
-("Contributor") and Evgeny Igumnov, the owner and maintainer of project ("Owner").
+("Contributor") and Liam Israel, the owner and maintainer of project ("Owner").
 
 1.Definitions:
 
