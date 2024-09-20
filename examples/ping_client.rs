@@ -2,7 +2,7 @@
 use easy_sockets::{
     error::{deserialize_error, serialize_error, ErrorCode},
     logger::log_error,
-    sleep, start_client, Deserialize, Duration, Serialize, SimpleClient,
+    sleep, Deserialize, Duration, Serialize, sockets::tcp::{ClientTCP, start_client}
 };
 
 /// Error codes for server client connection
@@ -60,7 +60,7 @@ impl Client {
         Self { ping_count: 0 }
     }
 }
-impl SimpleClient for Client {
+impl ClientTCP for Client {
     type ClientMsg = ClientMsg;
     type ServerMsg = ServerMsg;
 
