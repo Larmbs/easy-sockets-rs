@@ -1,8 +1,8 @@
 //! Client side of script
 use easy_sockets::{
     error::{deserialize_error, serialize_error, ErrorCode},
-    sleep, start_client, Deserialize, Duration, Serialize, SimpleClient,
     logger::log_error,
+    sleep, start_client, Deserialize, Duration, Serialize, SimpleClient,
 };
 
 /// Error codes for server client connection
