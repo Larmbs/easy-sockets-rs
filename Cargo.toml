@@ -2,6 +2,8 @@
 name = "easy-sockets"
 version = "0.1.0"
 edition = "2021"
+description = "A crate aimed at simplifying the creation of socket protocols"
+license = "LICENSE.md"
 
 [dependencies]
 anyhow = "1.0.87"
