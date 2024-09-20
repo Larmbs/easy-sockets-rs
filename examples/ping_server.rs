@@ -1,5 +1,5 @@
 //! Server side of script
-use easy_sockets::{Deserialize, Serialize, ServerConn, start_server, tokio};
+use easy_sockets::{start_server, tokio, Deserialize, Serialize, ServerConn};
 
 /// Message that a Client sends
 #[derive(Serialize, Deserialize)]
@@ -27,10 +27,10 @@ impl ServerConn for ServerInstance {
             ClientMsg::Ping(message) => {
                 println!("Received From Client: {}", message);
                 ServerMsg::Ping(self.response.clone())
-            },
+            }
         }
     }
-    
+
     fn new() -> Self {
         Self {
             response: "Hello Client".to_string(),
