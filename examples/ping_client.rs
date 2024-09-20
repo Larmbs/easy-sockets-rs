@@ -2,7 +2,9 @@
 use easy_sockets::{
     error::{deserialize_error, serialize_error, ErrorCode},
     logger::log_error,
-    sleep, Deserialize, Duration, Serialize, sockets::tcp::{ClientTCP, start_client}
+    sleep,
+    sockets::tcp::{start_client, ClientTCP},
+    Deserialize, Duration, Serialize,
 };
 
 /// Error codes for server client connection
