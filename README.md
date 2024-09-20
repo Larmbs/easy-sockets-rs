@@ -10,6 +10,7 @@ This project is similar to a previous project of mine, in this project I aimed t
 
 
 [Crate Easy Sockets](https://crates.io/crates/easy-sockets)
+
 ---
 
 ## Examples
