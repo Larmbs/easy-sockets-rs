@@ -1,34 +1,34 @@
 //! Defines a trait that represents an error code and its message.
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{de::Error, Deserialize, Deserializer, Serializer};
 
 /// Trait definable on enun to define error codes and their messages.
-pub trait ErrorCode {
+pub trait ErrorCode
+where
+    Self: Sized,
+{
+    /// Converts error to a code for compression
     fn to_code(&self) -> u16;
-    fn from_code(code: u16) -> Self;
+    /// Maps code to error type
+    fn from_code(code: u16) -> Option<Self>;
+    /// Returns error message attached to code
     fn message(&self) -> &'static str;
 }
 
-impl<T> Serialize for T
+// Helper function to serialize any ErrorCode type
+pub fn serialize_error<S, E>(error: &E, serializer: S) -> Result<S::Ok, S::Error>
 where
-    T: ErrorCode,
+    S: Serializer,
+    E: ErrorCode,
 {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_u16(self.to_code())
-    }
+    serializer.serialize_u16(error.to_code())
 }
 
-impl<'de, T> Deserialize<'de> for T
+// Helper function to deserialize any ErrorCode type
+pub fn deserialize_error<'de, D, E>(deserializer: D) -> Result<E, D::Error>
 where
-    T: ErrorCode,
+    D: Deserializer<'de>,
+    E: ErrorCode,
 {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let code = u16::deserialize(deserializer)?;
-        T::from_code(code).ok_or_else(|| serde::de::Error::custom("Invalid error code"))
-    }
+    let code = u16::deserialize(deserializer)?;
+    E::from_code(code).ok_or_else(|| D::Error::custom("Invalid error code"))
 }

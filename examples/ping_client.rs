@@ -1,5 +1,38 @@
 //! Client side of script
-use easy_sockets::{sleep, start_client, Deserialize, Duration, Serialize, SimpleClient};
+use easy_sockets::{
+    error::{deserialize_error, serialize_error, ErrorCode},
+    sleep, start_client, Deserialize, Duration, Serialize, SimpleClient,
+    logger::log_error,
+};
+
+/// Error codes for server client connection
+enum PingError {
+    BadRequest,
+    InternalServerError,
+}
+impl ErrorCode for PingError {
+    fn to_code(&self) -> u16 {
+        match self {
+            PingError::BadRequest => 400,
+            PingError::InternalServerError => 500,
+        }
+    }
+
+    fn from_code(code: u16) -> Option<Self> {
+        Some(match code {
+            400 => PingError::BadRequest,
+            500 => PingError::InternalServerError,
+            _ => return None,
+        })
+    }
+
+    fn message(&self) -> &'static str {
+        match self {
+            PingError::BadRequest => "Request provided was invalid.",
+            PingError::InternalServerError => "Server encountered unexpected internal error.",
+        }
+    }
+}
 
 /// Message that a Client sends
 #[derive(Serialize, Deserialize)]
@@ -10,7 +43,11 @@ enum ClientMsg {
 /// Message that the server sends
 #[derive(Serialize, Deserialize)]
 enum ServerMsg {
-    Error(u16),
+    #[serde(
+        serialize_with = "serialize_error",
+        deserialize_with = "deserialize_error"
+    )]
+    Error(PingError),
     Ping(String),
 }
 
@@ -28,7 +65,7 @@ impl SimpleClient for Client {
     type ServerMsg = ServerMsg;
 
     fn update(&mut self) -> Option<()> {
-        self.send_message(ClientMsg::Ping("Hello Server".to_string()))
+        self.send_message(ClientMsg::Ping("Hello Server".into()))
             .expect("Failed to send message");
         sleep(Duration::from_secs(1));
         // If you return None, client shuts down.
@@ -37,7 +74,7 @@ impl SimpleClient for Client {
 
     fn handle_response(&mut self, response: Self::ServerMsg) {
         match response {
-            ServerMsg::Error(code) => println!("Error Code Received From Server: {}", code),
+            ServerMsg::Error(error) => log_error(error),
             ServerMsg::Ping(msg) => {
                 println!("Ping Received From Server: {}", msg);
                 self.ping_count += 1;

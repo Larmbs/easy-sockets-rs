@@ -3,6 +3,9 @@
 mod tcp;
 mod udp;
 
+/// Largest single message payload
+pub const MAX_PAYLOAD_SIZE: u16 = 1450;
+
 /// Determines the socket protocol to be used.
 pub enum SocketType {
     /// Socket type with limited safety features making it inherently unreliable.

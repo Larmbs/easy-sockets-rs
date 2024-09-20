@@ -1,5 +1,37 @@
 //! Server side of script
-use easy_sockets::{start_server, tokio, Deserialize, Serialize, ServerConn};
+use easy_sockets::{
+    error::{deserialize_error, serialize_error, ErrorCode},
+    start_server, tokio, Deserialize, Serialize, ServerConn,
+};
+
+/// Error codes for server client connection
+enum PingError {
+    BadRequest,
+    InternalServerError,
+}
+impl ErrorCode for PingError {
+    fn to_code(&self) -> u16 {
+        match self {
+            PingError::BadRequest => 400,
+            PingError::InternalServerError => 500,
+        }
+    }
+
+    fn from_code(code: u16) -> Option<Self> {
+        Some(match code {
+            400 => PingError::BadRequest,
+            500 => PingError::InternalServerError,
+            _ => return None,
+        })
+    }
+
+    fn message(&self) -> &'static str {
+        match self {
+            PingError::BadRequest => "Request provided was invalid.",
+            PingError::InternalServerError => "Server encountered unexpected internal error.",
+        }
+    }
+}
 
 /// Message that a Client sends
 #[derive(Serialize, Deserialize)]
@@ -10,7 +42,11 @@ enum ClientMsg {
 /// Message that the server sends
 #[derive(Serialize, Deserialize)]
 enum ServerMsg {
-    Error(u16),
+    #[serde(
+        serialize_with = "serialize_error",
+        deserialize_with = "deserialize_error"
+    )]
+    Error(PingError),
     Ping(String),
 }
 
@@ -33,7 +69,7 @@ impl ServerConn for ServerInstance {
 
     fn new() -> Self {
         Self {
-            response: "Hello Client".to_string(),
+            response: "Hello Client".into(),
         }
     }
 }
