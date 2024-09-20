@@ -18,6 +18,7 @@ pub use tokio;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net;
 
+mod sockets;
 
 lazy_static! {
     static ref CLIENT: Mutex<Option<TcpStream>> = Mutex::new(None);
@@ -31,18 +32,18 @@ pub type Bytes = Vec<u8>;
 pub trait ServerConn {
     type ClientMsg: Serialize + for<'de> Deserialize<'de> + Send + 'static;
     type ServerMsg: Serialize + for<'de> Deserialize<'de> + Send + 'static;
-    
-		/// Handle Message
-		/// --------------
-		/// This function runs every time the server-conn receives a client message. You need to decide what message tp respond with.
-		/// 
+
+    /// Handle Message
+    /// --------------
+    /// This function runs every time the server-conn receives a client message. You need to decide what message tp respond with.
+    ///
     fn handle_message(&mut self, message: Self::ClientMsg) -> Self::ServerMsg;
-    
-		/// Opens a new server connection.
+
+    /// Opens a new server connection.
     fn new() -> Self;
 }
 
-/// Trait that simplifies the creation of the client side of a spcket protocol.
+/// Trait that simplifies the creation of the client side of a socket protocol.
 pub trait SimpleClient {
     type ClientMsg: Serialize + for<'de> Deserialize<'de> + Send + 'static;
     type ServerMsg: Serialize + for<'de> Deserialize<'de> + Send + 'static;
@@ -63,17 +64,17 @@ pub trait SimpleClient {
 
         Ok(())
     }
-    
-		/// Handle Response
-		/// ---------------
-		/// After sending a message to the server from the update function. You will receive a response from the server and will need to handle it here.
-		///
+
+    /// Handle Response
+    /// ---------------
+    /// After sending a message to the server from the update function. You will receive a response from the server and will need to handle it here.
+    ///
     fn handle_response(&mut self, response: Self::ServerMsg);
 
     /// Runs over and over (main loop).
     fn update(&mut self) -> Option<()>;
-    
-		/// Starts up the client.
+
+    /// Starts up the client.
     fn start_up(&mut self) {
         while self.update().is_some() {}
     }
@@ -90,11 +91,11 @@ impl<T> MsgAble for T
 where
     T: Serialize + for<'de> Deserialize<'de> + Send + 'static,
 {
-	  /// Converts object to bytes.
+    /// Converts object to bytes.
     fn to_bytes(&self) -> Result<Bytes> {
         serialize(self).context("Failed to serialize object")
     }
-		/// Creates an object from bytes.
+    /// Creates an object from bytes.
     fn from_bytes(bytes: &Bytes) -> Result<Self> {
         deserialize(bytes).context("Failed to deserialize object")
     }
