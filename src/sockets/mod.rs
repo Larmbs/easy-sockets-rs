@@ -21,3 +21,8 @@ pub enum SocketType {
     /// Only use this if you need features like multi casting and high flexibility.
     RawUDP,
 }
+
+/// Generic trait that applies to all sockets
+pub trait SocketClient {
+    fn start_client();
+}
