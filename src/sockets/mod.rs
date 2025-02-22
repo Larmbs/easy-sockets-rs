@@ -4,7 +4,7 @@ pub mod raw_udp;
 pub mod tcp;
 pub mod udp;
 
-//pub mod errors;
+pub mod errors;
 
 /// Largest single message payload
 pub const MAX_PAYLOAD_SIZE: usize = 1450;

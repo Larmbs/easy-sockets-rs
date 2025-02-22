@@ -82,7 +82,7 @@ impl ClientTCP for Client {
                 self.ping_count += 1;
             }
         }
-    }
+    } 
 }
 
 fn main() {
